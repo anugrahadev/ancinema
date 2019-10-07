@@ -16,4 +16,10 @@
     <string name="share">Share</string>
     <string name="review">Review</string>
     <string name="pref_now_playing">pref_now_playing</string>
+    <string name="Playing">Now Playing</string>
+    <string name="Popular">Popular</string>
+    <string name="toprate">Top-rated</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

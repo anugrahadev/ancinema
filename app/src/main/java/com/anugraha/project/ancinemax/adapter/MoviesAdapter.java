@@ -73,6 +73,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewGHol
                         Intent intent1 = new Intent(mContext, DetailActivity.class);
                         intent1.putExtra("original_title",movieList.get(pos).getOriginalTitle());
                         intent1.putExtra("poster_path",movieList.get(pos).getPosterPath());
+                        intent1.putExtra("backdrop_path",movieList.get(pos).getBackdropPath());
                         intent1.putExtra("overview",movieList.get(pos).getOverview());
                         intent1.putExtra("vote_average",Double.toString(movieList.get(pos).getVoteAverage()));
                         intent1.putExtra("release_date",movieList.get(pos).getReleaseDate());

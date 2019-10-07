@@ -16,4 +16,7 @@
     <dimen name="padding_layout">16dp</dimen>
     <item name="low_speed" type="dimen" format="float">120</item>
     <item name="normal_speed" type="dimen" format="float">100</item>
+    <dimen name="tab_max_width">264dp</dimen>
+    <dimen name="tab_indicator_height">3dp</dimen>
+    <dimen name="text_tab_size">14sp</dimen>
 </resources>

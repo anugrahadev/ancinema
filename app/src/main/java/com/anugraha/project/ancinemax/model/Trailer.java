@@ -54,12 +54,13 @@ public class Trailer {
     }
 
     public String getKey() {
-        return key;
+        return "<iframe src=\"https://www.youtube.com/embed/"+key+"\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>";
     }
 
     public void setKey(String key) {
         this.key = key;
     }
+
 
     public String getName() {
         return name;

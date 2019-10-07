@@ -2,6 +2,7 @@ package com.anugraha.project.ancinemax;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
@@ -12,7 +13,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +35,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 public class DetailActivity extends AppCompatActivity {
     TextView name, plot,rating,tglrilis;
-    ImageView poster;
+    ImageView poster,ivdetailposter;
+    WebView webView;
+    RatingBar bintang;
     private RecyclerView recyclerView;
     private TrailerAdapter adapter;
     private List<Trailer> trailerList;
@@ -50,10 +56,12 @@ public class DetailActivity extends AppCompatActivity {
         plot = (TextView) findViewById(R.id.plotsynopsis);
         rating = (TextView) findViewById(R.id.tv_user_rating);
         tglrilis = (TextView) findViewById(R.id.releasedate);
-
+        ivdetailposter = (ImageView) findViewById(R.id.posterview);
+        bintang = (RatingBar) findViewById(R.id.penilaian);
         Intent intentThatStartedThisAct = getIntent();
         if (intentThatStartedThisAct.hasExtra("original_title")){
-            String thumbnail = getIntent().getExtras().getString("poster_path");
+            String thumbnail = "https://image.tmdb.org/t/p/w500"+getIntent().getExtras().getString("backdrop_path");
+            String detailposter = getIntent().getExtras().getString("poster_path");
             String movieName = getIntent().getExtras().getString("original_title");
             String overview = getIntent().getExtras().getString("overview");
             String vote_average = getIntent().getExtras().getString("vote_average");
@@ -62,9 +70,24 @@ public class DetailActivity extends AppCompatActivity {
                     .load(thumbnail)
                     .placeholder(R.drawable.load)
                     .into(poster);
+            Glide.with(DetailActivity.this)
+                    .load(detailposter)
+                    .fitCenter()
+                    .placeholder(R.drawable.load)
+                    .override(100, 175)
+                    .into(ivdetailposter);
             name.setText(movieName);
             plot.setText(overview);
             rating.setText(vote_average);
+            if(Double.parseDouble(vote_average)<5){
+                rating.setTextColor(Color.RED);
+            }else if(Double.parseDouble(vote_average)<7){
+                rating.setTextColor(Color.parseColor("#FF5C22"));
+            }else{
+                rating.setTextColor(Color.GREEN);
+            }
+            bintang.setRating((Float.parseFloat(vote_average)/2));
+
             tglrilis.setText(release_date);
         }else {
             Toast.makeText(this,"No API Data",Toast.LENGTH_SHORT).show();
@@ -104,7 +127,7 @@ public class DetailActivity extends AppCompatActivity {
         adapter = new TrailerAdapter(this, trailerList);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view1);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayout.HORIZONTAL,false);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
