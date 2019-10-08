@@ -1,5 +1,6 @@
 package com.anugraha.project.ancinemax.api;
 
+import com.anugraha.project.ancinemax.model.CreditResponse;
 import com.anugraha.project.ancinemax.model.MoviesResponse;
 import com.anugraha.project.ancinemax.model.TrailerResponse;
 
@@ -24,5 +25,8 @@ public interface Service {
 
     @GET("movie/{movie_id}/videos")
     Call<TrailerResponse> getTrailer(@Path("movie_id") int id, @Query("api_key") String apiKey);
+
+    @GET("movie/{movie_id}/credits")
+    Call<CreditResponse> getCredits(@Path("movie_id") int id, @Query("api_key") String apiKey);
 
 }

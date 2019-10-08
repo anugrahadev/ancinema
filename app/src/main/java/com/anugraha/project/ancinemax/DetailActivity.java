@@ -38,6 +38,7 @@ public class DetailActivity extends AppCompatActivity {
     ImageView poster,ivdetailposter;
     WebView webView;
     RatingBar bintang;
+    public String movieName;
     private RecyclerView recyclerView;
     private TrailerAdapter adapter;
     private List<Trailer> trailerList;
@@ -60,9 +61,9 @@ public class DetailActivity extends AppCompatActivity {
         bintang = (RatingBar) findViewById(R.id.penilaian);
         Intent intentThatStartedThisAct = getIntent();
         if (intentThatStartedThisAct.hasExtra("original_title")){
-            String thumbnail = "https://image.tmdb.org/t/p/w500"+getIntent().getExtras().getString("backdrop_path");
+            String thumbnail = "https://image.tmdb.org/t/p/w780"+getIntent().getExtras().getString("backdrop_path");
             String detailposter = getIntent().getExtras().getString("poster_path");
-            String movieName = getIntent().getExtras().getString("original_title");
+            movieName = getIntent().getExtras().getString("original_title");
             String overview = getIntent().getExtras().getString("overview");
             String vote_average = getIntent().getExtras().getString("vote_average");
             String release_date = getIntent().getExtras().getString("release_date");
@@ -112,7 +113,7 @@ public class DetailActivity extends AppCompatActivity {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0){
-                    collapsingToolbarLayout.setTitle(getString(R.string.movie_details));
+                    collapsingToolbarLayout.setTitle(movieName);
                     isShow = true;
                 }else if (isShow){
                     collapsingToolbarLayout.setTitle(" ");
@@ -128,7 +129,10 @@ public class DetailActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view1);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayout.HORIZONTAL,false);
+        mLayoutManager.setAutoMeasureEnabled(true);
         recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setHasFixedSize(false);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
@@ -153,7 +157,6 @@ public class DetailActivity extends AppCompatActivity {
                 public void onResponse(Call<TrailerResponse> call, Response<TrailerResponse> response) {
                     List<Trailer> trailer = response.body().getResults();
                     recyclerView.setAdapter(new TrailerAdapter(getApplicationContext(), trailer));
-                    recyclerView.smoothScrollToPosition(0);
                 }
 
                 @Override

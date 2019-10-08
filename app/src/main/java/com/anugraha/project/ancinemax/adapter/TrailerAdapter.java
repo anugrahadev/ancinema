@@ -39,9 +39,8 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(final TrailerAdapter.MyViewHolder viewHolder, int i){
-//        viewHolder.title.setText(trailerList.get(i).getName());
         viewHolder.videoWeb.loadData(trailerList.get(i).getKey(), "text/html","utf-8");
-//        viewHolder.test.setText(trailerList.get(i).getKey());
+
 
     }
 

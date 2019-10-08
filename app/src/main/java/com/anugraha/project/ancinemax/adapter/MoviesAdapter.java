@@ -80,8 +80,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewGHol
                         intent1.putExtra("id",movieList.get(pos).getId());
                         intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(intent1);
-                        Toast.makeText(v.getContext(), "You're clicked "+clickedDataItem.getOriginalTitle(), Toast.LENGTH_SHORT).show();
-
 
                     }
                 }
