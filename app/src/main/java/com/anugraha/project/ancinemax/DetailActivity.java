@@ -20,14 +20,20 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anugraha.project.ancinemax.adapter.CreditAdapter;
 import com.anugraha.project.ancinemax.adapter.TrailerAdapter;
 import com.anugraha.project.ancinemax.api.Client;
 import com.anugraha.project.ancinemax.api.Service;
+import com.anugraha.project.ancinemax.model.Cast;
+import com.anugraha.project.ancinemax.model.CreditResponse;
 import com.anugraha.project.ancinemax.model.Trailer;
 import com.anugraha.project.ancinemax.model.TrailerResponse;
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -39,9 +45,13 @@ public class DetailActivity extends AppCompatActivity {
     WebView webView;
     RatingBar bintang;
     public String movieName;
-    private RecyclerView recyclerView;
-    private TrailerAdapter adapter;
+    private RecyclerView recyclerViewtrailer;
+    private TrailerAdapter adaptertrailer;
     private List<Trailer> trailerList;
+
+    private RecyclerView recyclerViewcast;
+    private CreditAdapter adaptercast;
+    private List<Cast> castList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +76,20 @@ public class DetailActivity extends AppCompatActivity {
             movieName = getIntent().getExtras().getString("original_title");
             String overview = getIntent().getExtras().getString("overview");
             String vote_average = getIntent().getExtras().getString("vote_average");
-            String release_date = getIntent().getExtras().getString("release_date");
+
+
+            SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat targetFormat = new SimpleDateFormat("dd MMM yyyy" );
+            Date date;
+            try {
+                String release_date = getIntent().getExtras().getString("release_date");
+                date = originalFormat.parse(release_date);
+                tglrilis.setText(targetFormat.format(date));
+            } catch (ParseException ex) {
+                // Handle Exception.
+            }
+
+
             Glide.with(DetailActivity.this)
                     .load(thumbnail)
                     .placeholder(R.drawable.load)
@@ -75,7 +98,7 @@ public class DetailActivity extends AppCompatActivity {
                     .load(detailposter)
                     .fitCenter()
                     .placeholder(R.drawable.load)
-                    .override(100, 175)
+                    .override(245, 175)
                     .into(ivdetailposter);
             name.setText(movieName);
             plot.setText(overview);
@@ -89,7 +112,7 @@ public class DetailActivity extends AppCompatActivity {
             }
             bintang.setRating((Float.parseFloat(vote_average)/2));
 
-            tglrilis.setText(release_date);
+
         }else {
             Toast.makeText(this,"No API Data",Toast.LENGTH_SHORT).show();
         }
@@ -125,23 +148,37 @@ public class DetailActivity extends AppCompatActivity {
 
     private void initViews(){
         trailerList = new ArrayList<>();
-        adapter = new TrailerAdapter(this, trailerList);
+        adaptertrailer = new TrailerAdapter(this, trailerList);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view1);
+        recyclerViewtrailer = (RecyclerView) findViewById(R.id.recycler_view_trailer);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayout.HORIZONTAL,false);
         mLayoutManager.setAutoMeasureEnabled(true);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setNestedScrollingEnabled(false);
-        recyclerView.setHasFixedSize(false);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        recyclerViewtrailer.setLayoutManager(mLayoutManager);
+        recyclerViewtrailer.setNestedScrollingEnabled(false);
+        recyclerViewtrailer.setHasFixedSize(false);
+        recyclerViewtrailer.setAdapter(adaptertrailer);
+        adaptertrailer.notifyDataSetChanged();
 
-        loadJSON();
+        loadJSONVideos();
+
+        castList= new ArrayList<>();
+        adaptercast = new  CreditAdapter(this, castList);
+        recyclerViewcast = (RecyclerView) findViewById(R.id.recycler_view_cast);
+
+        RecyclerView.LayoutManager mLayoutManagerCast = new LinearLayoutManager(getApplicationContext(), LinearLayout.HORIZONTAL,false);
+        mLayoutManagerCast.setAutoMeasureEnabled(true);
+        recyclerViewcast.setLayoutManager(mLayoutManagerCast);
+        recyclerViewcast.setNestedScrollingEnabled(false);
+        recyclerViewcast.setHasFixedSize(false);
+        recyclerViewcast.setAdapter(adaptercast);
+        adaptercast.notifyDataSetChanged();
+        loadJSONCast();
 
 
     }
 
-    private void  loadJSON(){
+
+    private void  loadJSONVideos(){
         int movie_id = getIntent().getExtras().getInt("id");
 
         try{
@@ -156,7 +193,7 @@ public class DetailActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<TrailerResponse> call, Response<TrailerResponse> response) {
                     List<Trailer> trailer = response.body().getResults();
-                    recyclerView.setAdapter(new TrailerAdapter(getApplicationContext(), trailer));
+                    recyclerViewtrailer.setAdapter(new TrailerAdapter(getApplicationContext(), trailer));
                 }
 
                 @Override
@@ -172,5 +209,37 @@ public class DetailActivity extends AppCompatActivity {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+
+    private void loadJSONCast() {
+        int movie_id = getIntent().getExtras().getInt("id");
+        try{
+            if (BuildConfig.THE_MOVIE_DB_API_TOKEN.isEmpty()){
+                Toast.makeText(getApplicationContext(), "Please obtain your API Key from themoviedb.org", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Client Client = new Client();
+            Service apiService = Client.getClient().create(Service.class);
+            Call<CreditResponse> call = apiService.getCredits(movie_id, BuildConfig.THE_MOVIE_DB_API_TOKEN);
+            call.enqueue(new Callback<CreditResponse>() {
+                @Override
+                public void onResponse(Call<CreditResponse> call, Response<CreditResponse> response) {
+                    List<Cast> cast = response.body().getCast();
+                    recyclerViewcast.setAdapter(new CreditAdapter(getApplicationContext(), cast));
+                }
+
+                @Override
+                public void onFailure(Call<CreditResponse> call, Throwable t) {
+                    Log.d("Error", t.getMessage());
+                    Toast.makeText(DetailActivity.this, "Error fetching trailer data", Toast.LENGTH_SHORT).show();
+
+                }
+            });
+
+        }catch (Exception e){
+            Log.d("Error", e.getMessage());
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

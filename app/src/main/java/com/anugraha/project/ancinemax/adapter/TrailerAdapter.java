@@ -14,7 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anugraha.project.ancinemax.R;
+import com.anugraha.project.ancinemax.VideoActivity;
 import com.anugraha.project.ancinemax.model.Trailer;
+import com.bumptech.glide.Glide;
 import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.util.List;
@@ -39,8 +41,12 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(final TrailerAdapter.MyViewHolder viewHolder, int i){
-        viewHolder.videoWeb.loadData(trailerList.get(i).getKey(), "text/html","utf-8");
-
+//        viewHolder.videoWeb.loadData("<iframe src=\\\"https://www.youtube.com/embed/\""+trailerList.get(i).getKey()+"\\\" frameborder=\\\"0\\\" allow=\\\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\\\" allowfullscreen></iframe>", "text/html","utf-8");
+        Glide.with(mContext)
+                .load("http://i3.ytimg.com/vi/"+trailerList.get(i).getKey()+"/hqdefault.jpg")
+                .placeholder(R.drawable.load)
+                .override(100, 175)
+                .into(viewHolder.iv_ytthumbnail);
 
     }
 
@@ -56,33 +62,30 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.MyViewHo
 //        public ImageView thumbnail;
 //        public YouTubePlayerView youtubePlayerView;
         public WebView videoWeb;
+        public ImageView iv_ytthumbnail,iv_playbutton;
         public TextView test;
         public MyViewHolder(View view){
             super(view);
-            videoWeb =(WebView) view.findViewById(R.id.videowebview);
-//            test =(TextView) view.findViewById(R.id.test);
-            videoWeb.getSettings().setJavaScriptEnabled(true);
-            videoWeb.setWebChromeClient(new WebChromeClient());
-
-
-//            title = (TextView) view.findViewById(R.id.title);
-//            thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-//            view.setOnClickListener(new View.OnClickListener(){
-//                @Override
-//                public void onClick(View v){
-//                    int pos = getAdapterPosition();
-//                    if (pos != RecyclerView.NO_POSITION){
-//                        Trailer clickedDataItem = trailerList.get(pos);
-//                        String videoId = trailerList.get(pos).getKey();
-//                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v="+videoId));
-//                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                        intent.putExtra("VIDEO_ID", videoId);
-//                        mContext.startActivity(intent);
-//
-//                        Toast.makeText(v.getContext(), "You clicked " + clickedDataItem.getName(), Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//            });
+            iv_playbutton = (ImageView) view.findViewById(R.id.iv_playbutton);
+            iv_ytthumbnail = (ImageView) view.findViewById(R.id.iv_ytthumbnail);
+            view.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    int pos = getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION){
+                        Trailer clickedDataItem = trailerList.get(pos);
+                        String videoId = trailerList.get(pos).getKey();
+                        Intent intent = new Intent(mContext, VideoActivity.class);
+                        intent.putExtra("VIDEO_ID", videoId);
+                        intent.putExtra("name",trailerList.get(pos).getName());
+                        intent.putExtra("type",trailerList.get(pos).getType());
+                        intent.putExtra("language",trailerList.get(pos).getIso6391());
+                        intent.putExtra("languagereg",trailerList.get(pos).getIso31661());
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
+                }
+            });
 
         }
     }
